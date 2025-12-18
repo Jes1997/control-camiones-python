@@ -16,6 +16,7 @@ def create_tables():
             empresa TEXT NOT NULL,
             camionero TEXT NOT NULL,
             observaciones TEXT,
-            fecha_hora TEXT NOT NULL
+            hora_entrada TEXT NOT NULL,
+            hora_salida TEXT
         );
         """)
