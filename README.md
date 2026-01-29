@@ -1,26 +1,109 @@
-# Control de Camiones (Python + SQLite)
+# 🚚 Control de Camiones – Sistema de Registro
 
-Mini-proyecto en Python para gestionar el registro de camiones con control de entrada y salida.
+![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-Database-blue?logo=sqlite&logoColor=white)
+![CLI](https://img.shields.io/badge/Interface-CLI-lightgrey)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-## Funcionalidades
+Sistema de control de **entrada y salida de camiones** desarrollado en **Python**, pensado como proyecto práctico para aplicar buenas prácticas, lógica de negocio y persistencia de datos usando **SQLite**.
 
-- Registrar **entrada y salida** de camiones automáticamente
-- Listado completo de registros
-- Edición de registros cerrados (entrada/salida/observaciones) con confirmación
-- Validación de fechas y control de datos
-- Persistencia mediante **SQLite**
-- Código organizado y limpio para demostrar buenas prácticas
+---
 
-## Tecnologías
+## 📌 Características principales
 
-- Python 3.x
-- SQLite (integrado en Python)
+- 🚛 Registro de **entrada de camiones**
+- ⏱️ Registro de **salida** con cálculo de tiempo
+- 📋 Listado completo de movimientos
+- ✏️ Edición de registros ya cerrados
+- ✅ Validación de datos y fechas
+- 💾 Persistencia de datos con **SQLite**
+- 🧩 Código modular y fácil de mantener
 
-## Cómo usar
+---
+
+## 🛠️ Tecnologías utilizadas
+
+- **Python 3**
+- **SQLite**
+- Aplicación de consola (CLI)
+- Programación estructurada
+- Separación de responsabilidades
+
+---
+
+## 📂 Estructura del proyecto
+
+```text
+control-camiones-python/
+│
+├── main.py            # Punto de entrada del programa
+├── database.py        # Conexión y configuración de la base de datos
+├── repository.py      # Operaciones CRUD
+├── models.py          # Modelos de datos
+├── utils.py           # Validaciones y utilidades
+├── camiones.db        # Base de datos SQLite
+└── README.md
+```
+
+---
+
+## ▶️ Cómo ejecutar el proyecto
 
 1. Clona el repositorio:
 
 ```bash
 git clone https://github.com/Jes1997/control-camiones-python.git
+```
+
+2. Accede al directorio:
+
+```bash
 cd control-camiones-python
 ```
+
+3. Ejecuta el programa:
+
+```bash
+python main.py
+```
+
+- Requiere Python 3
+- No necesita dependencias externas
+
+🧠 Qué se practica con este proyecto
+
+- Lógica de negocio aplicada a un caso real
+
+- Gestión de bases de datos con SQLite
+
+- Operaciones CRUD
+
+- Validación de entradas del usuario
+
+- Organización y limpieza del código
+
+- Desarrollo de aplicaciones de consola
+
+📸 Capturas
+
+(Pendiente de añadir capturas de la ejecución por consola)
+
+🚀 Posibles mejoras futuras
+
+- Interfaz gráfica (Tkinter / PyQt)
+
+- Versión web (Flask o Django)
+
+- Exportación de datos a CSV o PDF
+
+- Sistema de usuarios
+
+- Tests automáticos
+
+📄 Licencia
+
+Este proyecto está bajo la licencia MIT.
+
+👤 Autor
+
+Jesús García Castillo
