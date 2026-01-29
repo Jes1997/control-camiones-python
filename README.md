@@ -70,7 +70,7 @@ python main.py
 - Requiere Python 3
 - No necesita dependencias externas
 
-🧠 Qué se practica con este proyecto
+## 🧠 Qué se practica con este proyecto
 
 - Lógica de negocio aplicada a un caso real
 
@@ -84,11 +84,11 @@ python main.py
 
 - Desarrollo de aplicaciones de consola
 
-📸 Capturas
+## 📸 Capturas
 
 (Pendiente de añadir capturas de la ejecución por consola)
 
-🚀 Posibles mejoras futuras
+## 🚀 Posibles mejoras futuras
 
 - Interfaz gráfica (Tkinter / PyQt)
 
@@ -100,10 +100,10 @@ python main.py
 
 - Tests automáticos
 
-📄 Licencia
+## 📄 Licencia
 
 Este proyecto está bajo la licencia MIT.
 
-👤 Autor
+## 👤 Autor
 
 Jesús García Castillo

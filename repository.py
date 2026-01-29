@@ -1,183 +1,170 @@
+import os
+import sqlite3
 from datetime import datetime
-from database import get_connection
 
 
-def registrar_movimiento(matricula, empresa="", camionero="", observaciones=""):
-    hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+class Repository:
+    def __init__(self, db_path="db/control_camiones.db"):
+        self.db_path = db_path
+        self._ensure_db_folder()
+        self._initialize_db()
 
-    with get_connection() as conn:
-        # Buscar si existe un registro abierto (sin hora_salida)
-        cursor = conn.execute(
+    def _ensure_db_folder(self):
+        folder = os.path.dirname(self.db_path)
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+    def _connect(self):
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
+
+    def _initialize_db(self):
+        conn = self._connect()
+        cursor = conn.cursor()
+
+        # Tabla de registros
+        cursor.execute(
             """
-            SELECT id FROM registros
-            WHERE matricula = ? AND hora_salida IS NULL
-            ORDER BY hora_entrada DESC
-            LIMIT 1
-        """,
-            (matricula,),
-        )
-        registro_abierto = cursor.fetchone()
-
-        if registro_abierto:
-            # Registrar salida
-            conn.execute(
-                """
-                UPDATE registros
-                SET hora_salida = ?
-                WHERE id = ?
-            """,
-                (hora_actual, registro_abierto[0]),
+            CREATE TABLE IF NOT EXISTS registros_camiones (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                matricula TEXT NOT NULL,
+                empresa TEXT,
+                hora_entrada TEXT NOT NULL,
+                hora_salida TEXT
             )
-            return "Salida registrada ✅"
-        else:
-            # Registrar entrada
-            conn.execute(
-                """
-                INSERT INTO registros (matricula, empresa, camionero, observaciones, hora_entrada)
-                VALUES (?, ?, ?, ?, ?)
-            """,
-                (matricula, empresa, camionero, observaciones, hora_actual),
+        """
+        )
+
+        # Tabla de referencia para autocompletar empresa
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS camiones_ref (
+                matricula TEXT PRIMARY KEY,
+                empresa TEXT
             )
-            return "Entrada registrada ✅"
-
-
-def registrar_entrada(matricula, empresa, camionero, observaciones=""):
-    hora_entrada = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    with get_connection() as conn:
-        conn.execute(
-            """
-        INSERT INTO registros (matricula, empresa, camionero, observaciones, hora_entrada)
-        VALUES (?, ?, ?, ?, ?)
-        """,
-            (matricula, empresa, camionero, observaciones, hora_entrada),
+        """
         )
 
+        conn.commit()
+        conn.close()
 
-def registrar_salida(matricula):
-    hora_salida = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    with get_connection() as conn:
-        # Actualiza el registro más reciente que no tenga hora_salida
-        conn.execute(
+    # -----------------------------
+    # REGISTROS CAMIONES
+    # -----------------------------
+    def listar_camiones(self):
+        conn = self._connect()
+        cursor = conn.cursor()
+        cursor.execute(
             """
-        UPDATE registros
-        SET hora_salida = ?
-        WHERE matricula = ? AND hora_salida IS NULL
-        ORDER BY hora_entrada DESC
-        LIMIT 1
-        """,
-            (hora_salida, matricula),
+            SELECT * FROM registros_camiones
+            ORDER BY hora_entrada ASC
+        """
         )
+        filas = cursor.fetchall()
+        conn.close()
 
-
-def listar_registros():
-    with get_connection() as conn:
-        cursor = conn.execute("SELECT * FROM registros ORDER BY hora_entrada DESC")
-        registros = cursor.fetchall()
-        return registros
-
-
-def obtener_registro_abierto_o_finalizado(matricula):
-    """Devuelve el registro abierto o, si no hay, el último registro finalizado"""
-    with get_connection() as conn:
-        # Primero buscamos un registro abierto
-        cursor = conn.execute(
-            """
-            SELECT * FROM registros
-            WHERE matricula = ? AND hora_salida IS NULL
-            ORDER BY hora_entrada DESC
-            LIMIT 1
-        """,
-            (matricula,),
-        )
-        registro_abierto = cursor.fetchone()
-        if registro_abierto:
-            return registro_abierto, "abierto"
-
-        # Si no hay abierto, devolvemos el último finalizado
-        cursor = conn.execute(
-            """
-            SELECT * FROM registros
-            WHERE matricula = ?
-            ORDER BY hora_entrada DESC
-            LIMIT 1
-        """,
-            (matricula,),
-        )
-        registro_finalizado = cursor.fetchone()
-        if registro_finalizado:
-            return registro_finalizado, "finalizado"
-
-    return None, None
-
-
-def editar_registro(
-    registro_id, nuevas_observaciones=None, nueva_entrada=None, nueva_salida=None
-):
-    with get_connection() as conn:
-        conn.execute(
-            """
-            UPDATE registros
-            SET observaciones = COALESCE(?, observaciones),
-                hora_entrada = COALESCE(?, hora_entrada),
-                hora_salida = COALESCE(?, hora_salida)
-            WHERE id = ?
-        """,
-            (nuevas_observaciones, nueva_entrada, nueva_salida, registro_id),
-        )
-
-
-def validar_fecha(fecha_str):
-    if not fecha_str:  # vacío = no cambiar
-        return True
-    try:
-        datetime.strptime(fecha_str, "%Y-%m-%d %H:%M:%S")
-        return True
-    except ValueError:
-        return False
-
-
-def editar_registro_menu(registro):
-    while True:
-        print("\n¿Qué quieres modificar?")
-        print("1. Observaciones")
-        print("2. Hora de entrada")
-        print("3. Hora de salida")
-        print("4. Cancelar")
-
-        opcion = input("Selecciona una opción: ").strip()
-
-        if opcion == "1":
-            nuevas_obs = input(f"Nuevas observaciones [{registro[4]}]: ").strip()
-            editar_registro(
-                registro[0], nuevas_observaciones=nuevas_obs if nuevas_obs else None
+        resultado = []
+        for fila in filas:
+            estado = "Dentro" if fila["hora_salida"] is None else "Fuera"
+            resultado.append(
+                {
+                    "id": fila["id"],
+                    "matricula": fila["matricula"],
+                    "empresa": fila["empresa"],
+                    "entrada": fila["hora_entrada"],
+                    "salida": fila["hora_salida"],
+                    "estado": estado,
+                }
             )
-            print("✅ Observaciones actualizadas")
-        elif opcion == "2":
-            while True:
-                nueva_ent = input(f"Nueva hora de entrada [{registro[5]}]: ").strip()
-                if validar_fecha(nueva_ent):
-                    editar_registro(
-                        registro[0], nueva_entrada=nueva_ent if nueva_ent else None
-                    )
-                    print("✅ Hora de entrada actualizada")
-                    break
-                else:
-                    print("❌ Formato inválido. Usa YYYY-MM-DD HH:MM:SS")
-        elif opcion == "3":
-            while True:
-                nueva_sal = input(f"Nueva hora de salida [{registro[6]}]: ").strip()
-                if validar_fecha(nueva_sal):
-                    editar_registro(
-                        registro[0], nueva_salida=nueva_sal if nueva_sal else None
-                    )
-                    print("✅ Hora de salida actualizada")
-                    break
-                else:
-                    print("❌ Formato inválido. Usa YYYY-MM-DD HH:MM:SS")
-        elif opcion == "4":
-            print("🔒 Edición cancelada")
-            break
-        else:
-            print("❌ Opción no válida")
+        return resultado
+
+    def registrar_entrada(self, matricula, empresa=""):
+        if not matricula:
+            raise ValueError("La matrícula es obligatoria")
+        ahora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn = self._connect()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO registros_camiones (matricula, empresa, hora_entrada, hora_salida)
+            VALUES (?, ?, ?, NULL)
+        """,
+            (matricula, empresa, ahora),
+        )
+        conn.commit()
+        conn.close()
+
+    def registrar_salida(self, registro_id):
+        ahora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn = self._connect()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT hora_salida FROM registros_camiones WHERE id=?", (registro_id,)
+        )
+        fila = cursor.fetchone()
+        if fila is None:
+            conn.close()
+            raise ValueError("Registro no encontrado")
+        if fila["hora_salida"] is not None:
+            conn.close()
+            raise ValueError("Este camión ya tiene salida registrada")
+        cursor.execute(
+            "UPDATE registros_camiones SET hora_salida=? WHERE id=?",
+            (ahora, registro_id),
+        )
+        conn.commit()
+        conn.close()
+
+    def editar_registro(self, registro_id, matricula, empresa):
+        if not matricula:
+            raise ValueError("La matrícula no puede estar vacía")
+        conn = self._connect()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            UPDATE registros_camiones
+            SET matricula=?, empresa=?
+            WHERE id=?
+        """,
+            (matricula, empresa, registro_id),
+        )
+        conn.commit()
+        conn.close()
+
+    # -----------------------------
+    # CAMIONES REF
+    # -----------------------------
+    def get_empresa_by_matricula(self, matricula):
+        conn = self._connect()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT empresa FROM camiones_ref WHERE matricula=?", (matricula,)
+        )
+        fila = cursor.fetchone()
+        conn.close()
+        if fila:
+            return fila["empresa"]
+        return None
+
+    def add_or_update_camion_ref(self, matricula, empresa):
+        conn = self._connect()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO camiones_ref (matricula, empresa)
+            VALUES (?, ?)
+            ON CONFLICT(matricula) DO UPDATE SET empresa=excluded.empresa
+        """,
+            (matricula, empresa),
+        )
+        conn.commit()
+        conn.close()
+
+    def listar_camiones_ref(self):
+        conn = self._connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM camiones_ref ORDER BY matricula")
+        filas = cursor.fetchall()
+        conn.close()
+        return [dict(fila) for fila in filas]
