@@ -40,12 +40,15 @@ Sistema de control de **entrada y salida de camiones** desarrollado en **Python*
 ```text
 control-camiones-python/
 │
-├── main.py            # Punto de entrada del programa (CLI)
-├── gui.py             # Interfaz gráfica del sistema
-├── database.py        # Conexión y configuración de la base de datos
-├── repository.py      # Operaciones CRUD y referencias de camiones
+├── main.py                # Punto de entrada del programa (CLI)
+├── gui.py                 # Interfaz gráfica del sistema
+├── database.py            # Conexión y configuración de la base de datos
+├── repository.py          # Operaciones CRUD y referencias de camiones
 ├── db/
 │   └── control_camiones.db  # Base de datos SQLite
+├── screenshots/
+│   ├── tabla.png          # Captura de la tabla de registros
+│   └── autocompletado.gif # Captura del autocompletado de empresa
 └── README.md
 ```
 
@@ -70,7 +73,11 @@ cd control-camiones-python
 ```bash
 python gui.py
 ```
-También puedes ejecutar la versión CLI: python main.py
+También puedes ejecutar la versión CLI:
+
+```bash
+python main.py
+```
 
 - Requiere Python 3
 - No necesita dependencias externas
