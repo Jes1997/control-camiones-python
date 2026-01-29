@@ -2,10 +2,10 @@
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-Database-blue?logo=sqlite&logoColor=white)
-![CLI](https://img.shields.io/badge/Interface-CLI-lightgrey)
+![GUI](https://img.shields.io/badge/Interface-GUI-lightgrey)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-Sistema de control de **entrada y salida de camiones** desarrollado en **Python**, pensado como proyecto práctico para aplicar buenas prácticas, lógica de negocio y persistencia de datos usando **SQLite**.
+Sistema de control de **entrada y salida de camiones** desarrollado en **Python**, pensado como proyecto práctico para aplicar buenas prácticas, lógica de negocio y persistencia de datos usando **SQLite**, con **interfaz gráfica** amigable para usuarios.
 
 ---
 
@@ -18,6 +18,10 @@ Sistema de control de **entrada y salida de camiones** desarrollado en **Python*
 - ✅ Validación de datos y fechas
 - 💾 Persistencia de datos con **SQLite**
 - 🧩 Código modular y fácil de mantener
+- 🎨 **Interfaz gráfica (Tkinter) con tabla visual**
+- ⚡ **Autocompletado de empresa por matrícula**
+- ❌ **Indicador visual si el camión aún no ha salido**
+- 🎨 **Filas coloreadas por estado y contenido centrado**
 
 ---
 
@@ -25,7 +29,7 @@ Sistema de control de **entrada y salida de camiones** desarrollado en **Python*
 
 - **Python 3**
 - **SQLite**
-- Aplicación de consola (CLI)
+- Interfaz gráfica con **Tkinter**
 - Programación estructurada
 - Separación de responsabilidades
 
@@ -36,12 +40,12 @@ Sistema de control de **entrada y salida de camiones** desarrollado en **Python*
 ```text
 control-camiones-python/
 │
-├── main.py            # Punto de entrada del programa
+├── main.py            # Punto de entrada del programa (CLI)
+├── gui.py             # Interfaz gráfica del sistema
 ├── database.py        # Conexión y configuración de la base de datos
-├── repository.py      # Operaciones CRUD
-├── models.py          # Modelos de datos
-├── utils.py           # Validaciones y utilidades
-├── camiones.db        # Base de datos SQLite
+├── repository.py      # Operaciones CRUD y referencias de camiones
+├── db/
+│   └── control_camiones.db  # Base de datos SQLite
 └── README.md
 ```
 
@@ -61,11 +65,12 @@ git clone https://github.com/Jes1997/control-camiones-python.git
 cd control-camiones-python
 ```
 
-3. Ejecuta el programa:
+3. Ejecuta la GUI del programa:
 
 ```bash
-python main.py
+python gui.py
 ```
+También puedes ejecutar la versión CLI: python main.py
 
 - Requiere Python 3
 - No necesita dependencias externas
@@ -82,15 +87,21 @@ python main.py
 
 - Organización y limpieza del código
 
-- Desarrollo de aplicaciones de consola
+- Desarrollo de aplicaciones de consola y GUI
+
+- Autocompletado de campos
+
+- Diseño de interfaces amigables para usuario final
 
 ## 📸 Capturas
 
-(Pendiente de añadir capturas de la ejecución por consola)
+**Tabla principal con registros y colores por estado**  
+<img src="screenshots/tabla.png" alt="Tabla de camiones" width="600">
+
+**Autocompletado de empresa y registro de entrada**  
+<img src="screenshots/autocompletado.gif" alt="Autocompletado" width="600">
 
 ## 🚀 Posibles mejoras futuras
-
-- Interfaz gráfica (Tkinter / PyQt)
 
 - Versión web (Flask o Django)
 
