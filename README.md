@@ -2,7 +2,8 @@
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-Database-blue?logo=sqlite&logoColor=white)
-![GUI](https://img.shields.io/badge/Interface-GUI-lightgrey)
+![CLI](https://img.shields.io/badge/Interface-CLI%20%2F%20GUI-lightgrey)
+![Tkinter](https://img.shields.io/badge/GUI-Tkinter-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 Sistema de control de **entrada y salida de camiones** desarrollado en **Python**, pensado como proyecto práctico para aplicar buenas prácticas, lógica de negocio y persistencia de datos usando **SQLite**, con **interfaz gráfica** amigable para usuarios.
