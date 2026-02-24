@@ -138,7 +138,7 @@ class ControlCamionesGUI:
 
         registros = self.repo.listar_camiones()
         for reg in registros:
-            tag = "dentro" if reg["estado"] == "Dentro" else "fuera"
+            tag = "dentro" if reg["estado"] == "Dentro" else "Fuera"
             salida = reg["salida"] if reg["salida"] is not None else "❌"  # <-- X rojo
             self.tree.insert(
                 "",
@@ -220,11 +220,14 @@ class ControlCamionesGUI:
         matricula = values[0]
 
         registros = self.repo.listar_camiones()
-        registro_id = None
-        for r in registros:
-            if r["matricula"] == matricula and r["estado"] == "Dentro":
-                registro_id = r["id"]
-                break
+        registro = self.repo.get_registro_activo_por_matricula(matricula)
+        if registro is None:
+            messagebox.showerror(
+                "Error", "No se puede registrar salida para este camión"
+            )
+            return
+
+        registro_id = registro["id"]
 
         if registro_id is None:
             messagebox.showerror(

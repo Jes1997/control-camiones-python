@@ -9,9 +9,12 @@ class Repository:
         self._ensure_db_folder()
         self._initialize_db()
 
+    # -----------------------------
+    # Configuración de la base de datos
+    # -----------------------------
     def _ensure_db_folder(self):
         folder = os.path.dirname(self.db_path)
-        if not os.path.exists(folder):
+        if folder and not os.path.exists(folder):
             os.makedirs(folder)
 
     def _connect(self):
@@ -20,10 +23,11 @@ class Repository:
         return conn
 
     def _initialize_db(self):
+        # Crear tablas si no existen
         conn = self._connect()
         cursor = conn.cursor()
 
-        # Tabla de registros
+        # Tabla de registros de camiones
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS registros_camiones (
@@ -50,17 +54,12 @@ class Repository:
         conn.close()
 
     # -----------------------------
-    # REGISTROS CAMIONES
+    # CRUD de registros de camiones
     # -----------------------------
     def listar_camiones(self):
         conn = self._connect()
         cursor = conn.cursor()
-        cursor.execute(
-            """
-            SELECT * FROM registros_camiones
-            ORDER BY hora_entrada ASC
-        """
-        )
+        cursor.execute("SELECT * FROM registros_camiones ORDER BY hora_entrada ASC")
         filas = cursor.fetchall()
         conn.close()
 
@@ -82,6 +81,7 @@ class Repository:
     def registrar_entrada(self, matricula, empresa=""):
         if not matricula:
             raise ValueError("La matrícula es obligatoria")
+
         ahora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         conn = self._connect()
         cursor = conn.cursor()
@@ -122,18 +122,14 @@ class Repository:
         conn = self._connect()
         cursor = conn.cursor()
         cursor.execute(
-            """
-            UPDATE registros_camiones
-            SET matricula=?, empresa=?
-            WHERE id=?
-        """,
+            "UPDATE registros_camiones SET matricula=?, empresa=? WHERE id=?",
             (matricula, empresa, registro_id),
         )
         conn.commit()
         conn.close()
 
     # -----------------------------
-    # CAMIONES REF
+    # CRUD de camiones_ref (autocompletar empresa)
     # -----------------------------
     def get_empresa_by_matricula(self, matricula):
         conn = self._connect()
@@ -161,10 +157,26 @@ class Repository:
         conn.commit()
         conn.close()
 
-    def listar_camiones_ref(self):
+    # -----------------------------
+    # Obtener registro activo por matrícula
+    # -----------------------------
+    def get_registro_activo_por_matricula(self, matricula):
         conn = self._connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM camiones_ref ORDER BY matricula")
-        filas = cursor.fetchall()
+        cursor.execute(
+            "SELECT * FROM registros_camiones WHERE matricula=? AND hora_salida IS NULL",
+            (matricula,),
+        )
+        fila = cursor.fetchone()
         conn.close()
-        return [dict(fila) for fila in filas]
+
+        if fila:
+            return {
+                "id": fila["id"],
+                "matricula": fila["matricula"],
+                "empresa": fila["empresa"],
+                "entrada": fila["hora_entrada"],
+                "salida": fila["hora_salida"],
+                "estado": "Dentro",
+            }
+        return None

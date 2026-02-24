@@ -26,6 +26,22 @@ Sistema de control de **entrada y salida de camiones** desarrollado en **Python*
 
 ---
 
+## 🧪 Tests
+
+El proyecto incluye tests unitarios con `unittest` que validan:
+
+- ✅ Registro de entrada de camiones  
+- ✅ Registro de salida y actualización del estado  
+- ✅ Autocompletado de empresa por matrícula  
+- ✅ Obtención de registro activo por matrícula  
+- ✅ Creación automática de la base de datos si no existe  
+
+Para ejecutar los tests:
+
+```bash
+python -m unittest discover -s tests
+```
+
 ## 🛠️ Tecnologías utilizadas
 
 - **Python 3**
@@ -43,13 +59,14 @@ control-camiones-python/
 │
 ├── main.py                # Punto de entrada del programa (CLI)
 ├── gui.py                 # Interfaz gráfica del sistema
-├── database.py            # Conexión y configuración de la base de datos
 ├── repository.py          # Operaciones CRUD y referencias de camiones
 ├── db/
 │   └── control_camiones.db  # Base de datos SQLite
 ├── screenshots/
 │   ├── tabla.png          # Captura de la tabla de registros
 │   └── autocompletado.gif # Captura del autocompletado de empresa
+├── tests/                 # Tests unitarios
+│   └── test_repository.py
 └── README.md
 ```
 
@@ -57,25 +74,12 @@ control-camiones-python/
 
 ## ▶️ Cómo ejecutar el proyecto
 
-1. Clona el repositorio:
-
-```bash
-git clone https://github.com/Jes1997/control-camiones-python.git
-```
-
-2. Accede al directorio:
-
-```bash
-cd control-camiones-python
-```
-
-3. Ejecuta la GUI del programa:
-
+**Modo gráfico (recomendado):**
 ```bash
 python gui.py
 ```
-También puedes ejecutar la versión CLI:
 
+**Modo consola (CLI):**
 ```bash
 python main.py
 ```
@@ -117,7 +121,7 @@ python main.py
 
 - Sistema de usuarios
 
-- Tests automáticos
+- Tests automáticos adicionales
 
 ## 📄 Licencia
 

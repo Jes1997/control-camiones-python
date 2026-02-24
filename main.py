@@ -1,4 +1,3 @@
-from database import create_tables
 from repository import (
     registrar_movimiento,
     listar_registros,
